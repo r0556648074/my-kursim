@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>הקורסים שלי</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js')
+            .then(function(registration) {
+                console.log('ServiceWorker registration successful with scope: ', registration.scope);
+            })
+            .catch(function(error) {
+                console.log('ServiceWorker registration failed: ', error);
+            });
+        }
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #0CDB9D, #000000);
+            color: white;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            direction: rtl;
+        }
+        .container {
+            width: 80%;
+            max-width: 260px;
+            background-color: #3B3B3B;
+            padding: 35px;
+            border-radius: 70px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+        h1, h2 {
+            color: white;
+            margin: 100;
+        }
+        .form-group {
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        .form-group label {
+            display: block;
+            color: white;
+            margin-bottom: 10px;
+        }
+        .form-group input {
+            width: 80%;
+            padding: 15px;
+            border: 4px solid #CCC;
+            border-radius: 30px;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #0CDB9D;
+        }
+        .btn {
+            width: 50%;
+            padding: 15px;
+            background-color: #0CDB9D;
+            border: 4px solid #FFF;
+            border-radius: 30px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .btn:hover {
+            transform: scale(1.05);
+        }
+        .course-list {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .course-item {
+            width: 90px;
+            height: 90px;
+            background-color: #0CDB9D;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-radius: 100%;
+            border: 4px solid #FFF;
+            transition: transform 0.3s;
+        }
+        .course-item:hover {
+            transform: scale(1.1);
+        }
+        .course-item a {
+            color: white;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>הבית לקורסים שלי</h1>
+        <div class="form-group">
+            <label for="course-name">שם הקורס החדש:</label>
+            <input type="text" id="course-name" required>
+        </div>
+        <div class="form-group">
+            <label for="course-link">הקישור שקיבלת לקורס:</label>
+            <input type="url" id="course-link" required>
+        </div>
+        <button class="btn" onclick="addCourse()">צור</button>
+        <h2>הקורסים שלי:</h2>
+        <div class="course-list" id="course-list">
+        </div>
+    </div>
+
+    <script>
+        // Load courses from local storage when the page loads
+        document.addEventListener('DOMContentLoaded', (event) => {
+            loadCourses();
+        });
+
+        function addCourse() {
+            const courseName = document.getElementById('course-name').value;
+            const courseLink = document.getElementById('course-link').value;
+
+            if (courseName && courseLink) {
+                const courseList = document.getElementById('course-list');
+                const courseItem = document.createElement('div');
+                courseItem.className = 'course-item';
+                const courseLinkElement = document.createElement('a');
+                courseLinkElement.href = courseLink;
+                courseLinkElement.target = '_blank';
+                courseLinkElement.textContent = courseName;
+                courseItem.appendChild(courseLinkElement);
+                courseList.appendChild(courseItem);
+
+                // Save course to local storage
+                saveCourse(courseName, courseLink);
+
+                // Clear inputs
+                document.getElementById('course-name').value = '';
+                document.getElementById('course-link').value = '';
+            }
+        }
+
+        function saveCourse(name, link) {
+            let courses = JSON.parse(localStorage.getItem('courses')) || [];
+            courses.push({ name: name, link: link });
+            localStorage.setItem('courses', JSON.stringify(courses));
+        }
+
+        function loadCourses() {
+            let courses = JSON.parse(localStorage.getItem('courses')) || [];
+            const courseList = document.getElementById('course-list');
+            courses.forEach(course => {
+                const courseItem = document.createElement('div');
+                courseItem.className = 'course-item';
+                const courseLinkElement = document.createElement('a');
+                courseLinkElement.href = course.link;
+                courseLinkElement.target = '_blank';
+                courseLinkElement.textContent = course.name;
+                courseItem.appendChild(courseLinkElement);
+                courseList.appendChild(courseItem);
+            });
+        }
+    </script>
+</body>
+</html>
